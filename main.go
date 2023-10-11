@@ -57,8 +57,8 @@ func main() {
 	}
 }
 
-func createData(ctx context.Context, counter int, client *azblob.Client, containerNameTemplate string, blobNameTemplate string, blobSize int) error {
-	_, cancel := context.WithTimeout(ctx, time.Duration(time.Millisecond*3000))
+func createData(_ctx context.Context, counter int, client *azblob.Client, containerNameTemplate string, blobNameTemplate string, blobSize int) error {
+	ctx, cancel := context.WithTimeout(_ctx, time.Duration(time.Millisecond*3000))
 	defer cancel()
 
 	containerName := fmt.Sprintf("%s-%d", containerNameTemplate, counter)
@@ -80,8 +80,8 @@ func createData(ctx context.Context, counter int, client *azblob.Client, contain
 	return err
 }
 
-func cleanData(ctx context.Context, counter int, client *azblob.Client, containerNameTemplate string, blobNameTemplate string) error {
-	_, cancel := context.WithTimeout(ctx, time.Duration(time.Millisecond*3000))
+func cleanData(_ctx context.Context, counter int, client *azblob.Client, containerNameTemplate string, blobNameTemplate string) error {
+	ctx, cancel := context.WithTimeout(_ctx, time.Duration(time.Millisecond*3000))
 	defer cancel()
 
 	containerName := fmt.Sprintf("%s-%d", containerNameTemplate, counter)
