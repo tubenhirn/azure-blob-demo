@@ -27,8 +27,7 @@ func main() {
 	blobNameTemplate := "what-a-time-to-be-a-blob"
 	containerNameTemplate := "a-container"
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*5000))
-	defer cancel()
+	ctx := context.Background()
 
 	url := fmt.Sprintf("https://%s.blob.core.windows.net/", storageAccountName)
 
@@ -55,6 +54,9 @@ func main() {
 }
 
 func createData(ctx context.Context, counter int, client *azblob.Client, containerNameTemplate string, blobNameTemplate string) error {
+	_, cancel := context.WithTimeout(ctx, time.Duration(time.Millisecond*3000))
+	defer cancel()
+
 	containerName := fmt.Sprintf("%s-%d", containerNameTemplate, counter)
 	blobName := blobNameTemplate
 
@@ -68,6 +70,9 @@ func createData(ctx context.Context, counter int, client *azblob.Client, contain
 }
 
 func cleanData(ctx context.Context, counter int, client *azblob.Client, containerNameTemplate string, blobNameTemplate string) error {
+	_, cancel := context.WithTimeout(ctx, time.Duration(time.Millisecond*3000))
+	defer cancel()
+
 	containerName := fmt.Sprintf("%s-%d", containerNameTemplate, counter)
 	blobName := blobNameTemplate
 
