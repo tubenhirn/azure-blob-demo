@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
 	"flag"
 	"fmt"
 	"time"
@@ -15,11 +16,14 @@ func main() {
 	ac := flag.String("a", "", "the action (create, delete)")
 	sa := flag.String("s", "", "name of the azure storageaccount")
 	co := flag.Int("n", 5, "# of iterations")
+	bs := flag.Int("b", 1500000, "size of the blob example data in byte")
+
 	flag.Parse()
 
 	action := *ac
 	storageAccountName := *sa
 	blobCounter := *co
+	blobSize := *bs
 	if storageAccountName == "" {
 		panic("Flat storageAccountName missing.")
 	}
@@ -36,7 +40,7 @@ func main() {
 
 	if action == "create" {
 		for i := 0; i < blobCounter; i++ {
-			err := createData(ctx, i, client, containerNameTemplate, blobNameTemplate)
+			err := createData(ctx, i, client, containerNameTemplate, blobNameTemplate, blobSize)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -53,17 +57,24 @@ func main() {
 	}
 }
 
-func createData(ctx context.Context, counter int, client *azblob.Client, containerNameTemplate string, blobNameTemplate string) error {
+func createData(ctx context.Context, counter int, client *azblob.Client, containerNameTemplate string, blobNameTemplate string, blobSize int) error {
 	_, cancel := context.WithTimeout(ctx, time.Duration(time.Millisecond*3000))
 	defer cancel()
 
 	containerName := fmt.Sprintf("%s-%d", containerNameTemplate, counter)
 	blobName := blobNameTemplate
 
-	fmt.Printf("Creating a container named %s\n", containerName)
-	_, err := client.CreateContainer(ctx, containerName, nil)
+	data, err := fillBlob(blobSize)
+	if err != nil {
+		return err
+	}
 
-	data := []byte("\nIm a blob.\n")
+	fmt.Printf("Creating a container named %s\n", containerName)
+	_, err = client.CreateContainer(ctx, containerName, nil)
+	if err != nil {
+		return err
+	}
+
 	_, err = client.UploadBuffer(ctx, containerName, blobName, data, &azblob.UploadBufferOptions{})
 
 	return err
@@ -79,9 +90,19 @@ func cleanData(ctx context.Context, counter int, client *azblob.Client, containe
 	fmt.Printf("Deleting the blob " + blobName + "\n")
 
 	_, err := client.DeleteBlob(ctx, containerName, blobName, nil)
+	if err != nil {
+		return err
+	}
 
 	fmt.Printf("Deleting the container " + containerName + "\n")
 	_, err = client.DeleteContainer(ctx, containerName, nil)
 
 	return err
+}
+
+func fillBlob(size int) ([]byte, error) {
+	buf := make([]byte, size)
+	_, err := rand.Read(buf)
+
+	return buf, err
 }
