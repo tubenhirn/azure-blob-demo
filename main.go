@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
@@ -26,7 +27,8 @@ func main() {
 	blobNameTemplate := "what-a-time-to-be-a-blob"
 	containerNameTemplate := "a-container"
 
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*5000))
+	defer cancel()
 
 	url := fmt.Sprintf("https://%s.blob.core.windows.net/", storageAccountName)
 
