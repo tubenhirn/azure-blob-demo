@@ -25,7 +25,7 @@ func main() {
 	blobCounter := *co
 	blobSize := *bs
 	if storageAccountName == "" {
-		panic("Flat storageAccountName missing.")
+		panic("Flag storageAccountName missing.")
 	}
 
 	blobNameTemplate := "what-a-time-to-be-a-blob"
