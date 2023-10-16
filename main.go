@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"flag"
 	"fmt"
+	mrand "math/rand"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -101,7 +102,11 @@ func cleanData(_ctx context.Context, counter int, client *azblob.Client, contain
 }
 
 func fillBlob(size int) ([]byte, error) {
-	buf := make([]byte, size)
+	max := 5
+	min := 1
+	payloadRandomizer := mrand.Intn(max-min) + min
+
+	buf := make([]byte, size*payloadRandomizer)
 	_, err := rand.Read(buf)
 
 	return buf, err
