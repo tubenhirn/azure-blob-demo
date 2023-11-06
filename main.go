@@ -54,7 +54,7 @@ func main() {
 			}
 		}
 	} else {
-		fmt.Println("No action provided. Doin nothin.")
+		fmt.Println("no action provided. do nothin.")
 	}
 }
 
@@ -77,6 +77,9 @@ func createData(_ctx context.Context, counter int, client *azblob.Client, contai
 	}
 
 	_, err = client.UploadBuffer(ctx, containerName, blobName, data, &azblob.UploadBufferOptions{})
+	if err == nil {
+		fmt.Printf("uploaded blob: %s\n", blobName)
+	}
 
 	return err
 }
